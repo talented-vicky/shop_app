@@ -38,3 +38,12 @@ class MyApp extends StatelessWidget {
 // state is simply dynamic data which affects UI
 // home page should have search (extreme right) and 
 // logo (left) alone
+
+
+
+
+/*
+C:\Users\HP\Documents\personal\php\php.exe is not a valid 
+php executable. Use the setting 'php.validate.executablePath' 
+to configure the PHP executable.
+ */

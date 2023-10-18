@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../providers/product.dart';
-import '../../views/product_detail.dart';
+import '../providers/product.dart';
+import '../views/product_detail.dart';
 
 class ProductItem extends StatelessWidget {
   // final String id, img, title;
@@ -16,7 +16,7 @@ class ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final product = Provider.of<Product>(context, listen: false);
-    print("won't get here by merely clicking on fav icon");
+    // print("won't get here by merel y clicking on fav icon");
     return Container(
       margin: const EdgeInsets.all(5),
       child: ClipRRect(

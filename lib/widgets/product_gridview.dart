@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import './product_item.dart';
-import '../../providers/products.dart';
+import '../providers/products.dart';
 
 class ProductGridview extends StatelessWidget {
-  const ProductGridview({super.key});
+  final bool checkFav;
+  const ProductGridview({super.key, required this.checkFav});
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +18,8 @@ class ProductGridview extends StatelessWidget {
 
     // (1) now the "ss" checks the parent of "productGridView"
     // for a provider
+    final products = checkFav ? productsData.favProds : productsData.prods;
 
-    final products = productsData.prods;
     return GridView.builder(
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2, // number of columns

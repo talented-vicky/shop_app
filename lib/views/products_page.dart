@@ -1,43 +1,60 @@
 import 'package:flutter/material.dart';
 
-import '../utils/widgets/product_gridview.dart';
+import '../widgets/product_gridview.dart';
 
 enum FavEnum { favoriteProds, allProds }
 
-class ProductsPage extends StatelessWidget {
+class ProductsPage extends StatefulWidget {
   const ProductsPage({super.key});
-  // (2) this is the parent of "productGridView" but no provider
-  // is found, so it moves to the parent of "Products"
 
+  @override
+  State<ProductsPage> createState() => _ProductsPageState();
+}
+
+class _ProductsPageState extends State<ProductsPage> {
+  // (2) this is the parent of "productGridView" but no provider
+
+  var showFav = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("New SApp"),
+        forceMaterialTransparency: true,
+        title: const Text(
+          "Menu",
+          style: TextStyle(color: Colors.black),
+        ),
+        leading: const Icon(
+          Icons.home,
+          color: Colors.black,
+        ),
         actions: [
           PopupMenuButton(
+            color: Colors.black,
             onSelected: (FavEnum val) {
-              if (val == FavEnum.favoriteProds) {
-                //
-              } else {
-                //
-              }
+              setState(() {
+                if (val == FavEnum.favoriteProds) {
+                  showFav = true;
+                } else {
+                  showFav = false;
+                }
+              });
             },
             icon: const Icon(Icons.more_vert_rounded),
             itemBuilder: (_) => const [
               PopupMenuItem(
                 value: FavEnum.favoriteProds,
-                child: Text("Favourite"),
+                child: Text("Favourite", style: TextStyle(color: Colors.white)),
               ),
               PopupMenuItem(
                 value: FavEnum.allProds,
-                child: Text("All"),
+                child: Text("All", style: TextStyle(color: Colors.white)),
               )
             ],
           )
         ],
       ),
-      body: const ProductGridview(),
+      body: ProductGridview(checkFav: showFav),
     );
   }
 }

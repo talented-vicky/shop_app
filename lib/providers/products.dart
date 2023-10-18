@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'product.dart';
 
 class Products with ChangeNotifier {
-  List<Product> _prods = [
+  // List<Product> _prods = [ // actually use this once user input
+  // // sets in
+  final List<Product> _prods = [
     Product(
       id: 'p1',
       title: 'Headset',
@@ -40,6 +42,10 @@ class Products with ChangeNotifier {
 
   List<Product> get prods {
     return [..._prods];
+  }
+
+  List<Product> get favProds {
+    return _prods.where((elem) => elem.isFav == true).toList();
   }
 
   Product findbyId(String id) {
