@@ -15,7 +15,7 @@ class ProductDetail extends StatelessWidget {
     final product = Provider.of<Products>(
       context,
       listen: false,
-      // b'cos fetching a product detail is a once time action,
+      // b'cos fetching a product detail is a one-time action,
       // hence need not update, UNLIKE in GRIDVIEW, casue a user
       // can add or remove a product at any time
     ).findbyId(prodId);

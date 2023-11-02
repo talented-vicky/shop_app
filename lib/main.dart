@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import './views/products_page.dart';
 import './views/product_detail.dart';
 import './providers/products.dart';
+import './providers/cart.dart';
 
 void main() => runApp(const MyApp());
 
@@ -17,8 +18,15 @@ class MyApp extends StatelessWidget {
   // the Provider.of<"ProductP">(ctxt)
 
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider(
-        create: (ctxt) => Products(),
+  Widget build(BuildContext context) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (ctxt) => Products(),
+          ),
+          ChangeNotifierProvider(
+            create: (ctxt) => Cart(),
+          )
+        ],
         child: MaterialApp(
           title: "devApp", // what'll show on the app icon gangan
           debugShowCheckedModeBanner: false,

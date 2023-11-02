@@ -12,7 +12,7 @@ class ProductGridview extends StatelessWidget {
   Widget build(BuildContext context) {
     final productsData = Provider.of<Products>(context);
     // I am able to listen (with "Provider.of(ctxt)", at
-    // "ProductP" widget) because a direct/indirect parent of
+    // "Products" widget) because a direct/indirect parent of
     // this widget already has provider set in it (main.dart in
     // this case using "ChangeNotifierProvider")
 
