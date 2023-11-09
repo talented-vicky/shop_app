@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'providers/product.dart';
+import './providers/cart.dart';
+import './providers/order.dart';
+
 import './views/products_page.dart';
 import './views/product_detail.dart';
-import './providers/products.dart';
-import './providers/cart.dart';
+import './views/order_page.dart';
+import './views/cart_page.dart';
 
 void main() => runApp(const MyApp());
 
@@ -19,28 +23,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (ctxt) => Products(),
-          ),
-          ChangeNotifierProvider(
-            create: (ctxt) => Cart(),
-          )
-        ],
-        child: MaterialApp(
-          title: "devApp", // what'll show on the app icon gangan
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            primarySwatch: Colors.green,
-            primaryColor: Colors.amberAccent,
-            fontFamily: 'Lato',
-          ),
-          home: const ProductsPage(),
-          routes: {
-            ProductDetail.routename: (ctxt) => const ProductDetail(),
-          },
-        ),
-      );
+          providers: [
+            ChangeNotifierProvider(create: (ctxt) => Products()),
+            ChangeNotifierProvider(create: (ctxt) => Cart()),
+            ChangeNotifierProvider(create: (ctxt) => Order())
+          ],
+          child: MaterialApp(
+            title: "devApp", // what'll show on the app icon gangan
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+                primarySwatch: Colors.green,
+                primaryColor: const Color.fromARGB(255, 6, 212, 195),
+                fontFamily: 'Lato'),
+            home: const ProductsPage(),
+            routes: {
+              ProductDetail.routename: (ctxt) => const ProductDetail(),
+              CartPage.routeName: (ctxt) => const CartPage(),
+              OrderPage.routeName: (ctxt) => const OrderPage()
+            },
+          ));
 }
 
 // state is simply dynamic data which affects UI
