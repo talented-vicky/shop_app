@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../views/order_page.dart';
+import '../views/user_products.dart';
 
 class NavDrawer extends StatelessWidget {
   const NavDrawer({super.key});
@@ -28,6 +29,13 @@ class NavDrawer extends StatelessWidget {
               title: const Text('Orders'),
               onTap: () => Navigator.of(context)
                   .pushReplacementNamed(OrderPage.routeName)),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Manage Products'),
+            onTap: () => Navigator.of(context)
+                .pushReplacementNamed(UserProducts.routeName),
+          ),
         ]),
       );
 }

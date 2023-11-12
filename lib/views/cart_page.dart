@@ -15,7 +15,6 @@ class CartPage extends StatelessWidget {
   Widget build(BuildContext context) {
     // setting up a listener (that causes app rebuild)
     final cart = Provider.of<Cart>(context);
-    // final order = Provider.of<Order>(context);
 
     return Container(
         child: Scaffold(
@@ -52,7 +51,7 @@ class CartPage extends StatelessWidget {
                                     cart.totalAmount,
                                   );
                                   // now clear Cart
-                                  cart.clearCart;
+                                  cart.clearCart();
                                 },
                                 child: Text(
                                   "Order Now!",

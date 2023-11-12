@@ -9,6 +9,8 @@ import './views/products_page.dart';
 import './views/product_detail.dart';
 import './views/order_page.dart';
 import './views/cart_page.dart';
+import './views/user_products.dart';
+import './views/edit_product.dart';
 
 void main() => runApp(const MyApp());
 
@@ -39,7 +41,9 @@ class MyApp extends StatelessWidget {
             routes: {
               ProductDetail.routename: (ctxt) => const ProductDetail(),
               CartPage.routeName: (ctxt) => const CartPage(),
-              OrderPage.routeName: (ctxt) => const OrderPage()
+              OrderPage.routeName: (ctxt) => const OrderPage(),
+              UserProducts.routeName: (ctxt) => const UserProducts(),
+              EditProduct.routeName: (ctxt) => const EditProduct(),
             },
           ));
 }
