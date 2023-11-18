@@ -1,7 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class Product with ChangeNotifier {
-  final String id, title, imageUrl, description;
+  final dynamic id;
+  final String title, imageUrl, description;
   final double price;
   bool isFav;
 
@@ -68,5 +72,67 @@ class Products with ChangeNotifier {
 
   Product findbyId(String id) {
     return prods.firstWhere((elem) => elem.id == id);
+  }
+
+  Future<void> getProduct() async {
+    final url = Uri.parse(
+        "https://shop-app-73a49-default-rtdb.firebaseio.com/getproducts.json");
+    try {
+      final data = await http.get(url);
+      print(data);
+    } catch (error) {
+      throw error;
+      // I have to throw peradventure I need to display any form
+      // of error info to the user
+    }
+  }
+
+  Future<void> addProduct(Product prodDetail) async {
+    var url = Uri.parse(
+        "https://shop-app-73a49-default-rtdb.firebaseio.com/addproducts.json");
+    try {
+      final postRes = await http.post(
+        url,
+        body: json.encode({
+          'id': prodDetail.id,
+          'title': prodDetail.title,
+          'price': prodDetail.price,
+          'derscription': prodDetail.description,
+          'isFav': prodDetail.isFav,
+        }),
+      );
+      print(postRes);
+      final firebaseID = json.decode(postRes.body)['name'];
+
+      final newProd = Product(
+        id: firebaseID,
+        title: prodDetail.title,
+        imageUrl: prodDetail.imageUrl,
+        description: prodDetail.description,
+        price: prodDetail.price,
+      );
+      _prods.add(newProd);
+
+      notifyListeners();
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+  }
+
+  void updateOne(String prodId, Product prodDetail) {
+    final prodInd = _prods.indexWhere((elem) => elem.id == prodId);
+    if (prodInd >= 0) {
+      // recall this would give -1 if it doesn't find product
+      _prods[prodInd] = prodDetail;
+      notifyListeners();
+    } else {
+      print('...');
+    }
+  }
+
+  void deleteOne(String prodId) {
+    _prods.removeWhere((elem) => elem.id == prodId);
+    notifyListeners();
   }
 }

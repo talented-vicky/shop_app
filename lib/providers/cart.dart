@@ -4,6 +4,10 @@ import 'package:flutter/material.dart';
 // return/get a value/object/list, and a function when
 // you wanna perform an actual action and requires listening
 
+// when using provider to dispatch an action, you typically
+// don't listen to changes, to avoid the specific widget
+// from rebuilding
+
 class CartItem {
   final String id, title;
   final double price;

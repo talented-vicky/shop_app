@@ -50,7 +50,6 @@ class CartPage extends StatelessWidget {
                                     cart.allItems.values.toList(),
                                     cart.totalAmount,
                                   );
-                                  // now clear Cart
                                   cart.clearCart();
                                 },
                                 child: Text(
@@ -62,15 +61,13 @@ class CartPage extends StatelessWidget {
               Expanded(
                   child: ListView.builder(
                 itemCount: cart.itemCount,
-                itemBuilder: (BuildContext context, int ind) {
-                  return CartItem(
-                    // id: cart.allItems[ind]!.id, gives an error
-                    id: cart.allItems.values.toList()[ind].id,
-                    price: cart.allItems.values.toList()[ind].price,
-                    quantity: cart.allItems.values.toList()[ind].quantity,
-                    title: cart.allItems.values.toList()[ind].title,
-                  );
-                },
+                itemBuilder: (BuildContext context, int ind) => CartItem(
+                  // id: cart.allItems[ind]!.id, gives an error
+                  id: cart.allItems.values.toList()[ind].id,
+                  price: cart.allItems.values.toList()[ind].price,
+                  quantity: cart.allItems.values.toList()[ind].quantity,
+                  title: cart.allItems.values.toList()[ind].title,
+                ),
               ))
             ])));
   }

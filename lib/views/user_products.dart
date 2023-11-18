@@ -25,6 +25,8 @@ class UserProducts extends StatelessWidget {
             IconButton(
                 onPressed: () =>
                     Navigator.of(context).pushNamed(EditProduct.routeName),
+                // here I'm not passing any argument to the route hence
+                // loading this will fail without the if check in ediProd page
                 icon: const Icon(Icons.add))
           ]),
       drawer: const NavDrawer(),
@@ -33,6 +35,7 @@ class UserProducts extends StatelessWidget {
         itemBuilder: (BuildContext context, int ind) => Column(
           children: [
             UserProductItem(
+              id: product.prods[ind].id,
               title: product.prods[ind].title,
               image: product.prods[ind].imageUrl,
             ),

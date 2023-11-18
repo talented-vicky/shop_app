@@ -7,6 +7,7 @@ import '../widgets/nav_drawer.dart';
 
 import '../views/cart_page.dart';
 import '../providers/cart.dart';
+import '../providers/product.dart';
 
 enum FavEnum { favoriteProds, allProds }
 
@@ -19,6 +20,11 @@ class ProductsPage extends StatefulWidget {
 
 class _ProductsPageState extends State<ProductsPage> {
   // (2) this is the parent of "productGridView" but no provider
+  @override
+  void initState() {
+    super.initState();
+    Provider.of<Products>(context, listen: false).getProduct();
+  }
 
   var showFav = false;
   @override
