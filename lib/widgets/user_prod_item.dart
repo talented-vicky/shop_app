@@ -27,29 +27,33 @@ class UserProductItem extends StatelessWidget {
           IconButton(
               onPressed: () {
                 showDialog(
-                  context: context,
-                  builder: (ctxt) => AlertDialog(
-                    title: const Text("Delete Product!"),
-                    content: const Text(
-                        'This is an irreversible action, and will remove product from database'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(ctxt).pop();
-                          Provider.of<Products>(context, listen: false)
-                              .deleteOne(id);
-                        },
-                        child: const Text('Confirm Delete'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(ctxt).pop();
-                        },
-                        child: const Text('Abort'),
-                      ),
-                    ],
-                  ),
-                );
+                    context: context,
+                    builder: (ctxt) => AlertDialog(
+                            title: const Text("Delete Product!"),
+                            content: const Text(
+                                'This is an irreversible action, and will remove product from database'),
+                            actions: [
+                              TextButton(
+                                  onPressed: () async {
+                                    Navigator.of(ctxt).pop();
+                                    try {
+                                      await Provider.of<Products>(context,
+                                              listen: false)
+                                          .deleteOne(id);
+                                    } catch (e) {
+                                      // check here
+                                      ScaffoldMessenger.of(ctxt)
+                                          .showSnackBar(const SnackBar(
+                                        content: Text("Error Deleting Product"),
+                                      ));
+                                    }
+                                  },
+                                  child: const Text('Confirm Delete')),
+                              TextButton(
+                                onPressed: () => Navigator.of(ctxt).pop(),
+                                child: const Text('Abort'),
+                              ),
+                            ]));
               },
               icon: Icon(Icons.delete,
                   color: Theme.of(context).colorScheme.error))

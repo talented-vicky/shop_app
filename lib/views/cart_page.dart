@@ -40,23 +40,7 @@ class CartPage extends StatelessWidget {
                               backgroundColor: Theme.of(context).primaryColor,
                             ),
                             const Spacer(),
-                            TextButton(
-                                onPressed: () {
-                                  Provider.of<Order>(
-                                    context,
-                                    listen: false,
-                                    // not listening coz I just wanna dispatch an action
-                                  ).placeOrder(
-                                    cart.allItems.values.toList(),
-                                    cart.totalAmount,
-                                  );
-                                  cart.clearCart();
-                                },
-                                child: Text(
-                                  "Order Now!",
-                                  style: TextStyle(
-                                      color: Theme.of(context).primaryColor),
-                                ))
+                            OrderButton(cart: cart)
                           ]))),
               Expanded(
                   child: ListView.builder(
@@ -71,4 +55,42 @@ class CartPage extends StatelessWidget {
               ))
             ])));
   }
+}
+
+class OrderButton extends StatefulWidget {
+  OrderButton({super.key, required this.cart});
+
+  final Cart cart;
+  bool _isLoading = false;
+
+  @override
+  State<OrderButton> createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  @override
+  Widget build(BuildContext context) => TextButton(
+      // disable button if total amount in cart is 0
+      // or isloading state is true
+      onPressed: widget.cart.totalAmount == 0 || widget._isLoading
+          ? null
+          : () async {
+              try {
+                setState(() => widget._isLoading = true);
+                await Provider.of<Order>(context, listen: false).placeOrder(
+                    widget.cart.allItems.values.toList(),
+                    widget.cart.totalAmount);
+                widget.cart.clearCart();
+                setState(() => widget._isLoading = false);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Error Placing Order")));
+              }
+            },
+      child: widget._isLoading
+          ? const CircularProgressIndicator()
+          : Text(
+              "Order Now!",
+              style: TextStyle(color: Theme.of(context).primaryColor),
+            ));
 }

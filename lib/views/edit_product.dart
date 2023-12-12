@@ -51,6 +51,8 @@ class _EditProductState extends State<EditProduct> {
 
   @override
   void didChangeDependencies() {
+    // I wanna do all the actions in the if statement because
+    // I am loading it for the first time
     if (_initState) {
       final prodId = ModalRoute.of(context)!.settings.arguments;
       // final prodId = ModalRoute.of(context)!.settings.arguments as dynamic;
@@ -80,6 +82,8 @@ class _EditProductState extends State<EditProduct> {
       }
     }
     _initState = false;
+    // by setting initstate to false I ensure didchangedep never
+    // runs again
 
     super.didChangeDependencies();
   }
@@ -118,50 +122,48 @@ class _EditProductState extends State<EditProduct> {
 
     if (_editProd.id != null) {
       // product exists before
-      Provider.of<Products>(context, listen: false)
+      await Provider.of<Products>(context, listen: false)
           .updateOne(_editProd.id, _editProd);
-      setState(() => _isLoading = false);
-      // I turn indicator off once I'm done with action
-      Navigator.of(context).pop();
     } else {
       try {
         await Provider.of<Products>(context, listen: false)
             .addProduct(_editProd);
       } catch (e) {
         await showDialog(
-          context: context,
-          builder: (ctxt) => AlertDialog(
-            title: const Text('Error Occured'),
-            content: const Text(
-                'Check your internet connection, or your proxy server'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(ctxt).pop(),
-                child: const Text('Okay'),
-              )
-            ],
-          ),
-        );
-      } finally {
-        // runs irrespective of the try and/or catch running
-        setState(() => _isLoading = false);
-        Navigator.of(context).pop();
+            context: context,
+            builder: (ctxt) => AlertDialog(
+                    title: const Text('Error Occured'),
+                    content: const Text(
+                        'Check your internet connection, or your proxy server'),
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.of(ctxt).pop(),
+                          child: const Text('Okay'))
+                    ]));
       }
+      // finally {
+      //   // runs irrespective of the try and/or catch running
+      //   setState(() => _isLoading = false);
+      //   Navigator.of(context).pop();
+      // }
     }
+    // the code below will now run if any of the if/else
+    // stuff runs
+    setState(() => _isLoading = false);
+    Navigator.of(context).pop();
   }
 
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-        title: const Text("Edit prod", style: TextStyle(color: Colors.black)),
-        forceMaterialTransparency: true,
-        centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.black),
-        actions: [
-          IconButton(
-              onPressed: () => _submitForm(), icon: const Icon(Icons.save))
-        ],
-      ),
+          title: const Text("Edit prod", style: TextStyle(color: Colors.black)),
+          forceMaterialTransparency: true,
+          centerTitle: true,
+          iconTheme: const IconThemeData(color: Colors.black),
+          actions: [
+            IconButton(
+                onPressed: () => _submitForm(), icon: const Icon(Icons.save))
+          ]),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Padding(

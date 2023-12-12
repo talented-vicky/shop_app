@@ -9,6 +9,13 @@ import '../views/edit_product.dart';
 
 class UserProducts extends StatelessWidget {
   static const routeName = '/user';
+
+  Future<void> _prodRefresh(BuildContext ctxt) async {
+    // nb: an async always returns a future hence I
+    // wouldn't need to return from the function
+    await Provider.of<Products>(ctxt, listen: false).getProduct();
+  }
+
   const UserProducts({super.key});
 
   @override
@@ -30,18 +37,18 @@ class UserProducts extends StatelessWidget {
                 icon: const Icon(Icons.add))
           ]),
       drawer: const NavDrawer(),
-      body: ListView.builder(
-        itemCount: product.prods.length,
-        itemBuilder: (BuildContext context, int ind) => Column(
-          children: [
-            UserProductItem(
-              id: product.prods[ind].id,
-              title: product.prods[ind].title,
-              image: product.prods[ind].imageUrl,
-            ),
-            const Divider()
-          ],
-        ),
+      body: RefreshIndicator(
+        onRefresh: () => _prodRefresh(context),
+        child: ListView.builder(
+            itemCount: product.prods.length,
+            itemBuilder: (BuildContext context, int ind) => Column(children: [
+                  UserProductItem(
+                    id: product.prods[ind].id,
+                    title: product.prods[ind].title,
+                    image: product.prods[ind].imageUrl,
+                  ),
+                  const Divider()
+                ])),
       ),
     );
   }

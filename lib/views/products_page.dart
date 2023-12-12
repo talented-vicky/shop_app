@@ -20,13 +20,22 @@ class ProductsPage extends StatefulWidget {
 
 class _ProductsPageState extends State<ProductsPage> {
   // (2) this is the parent of "productGridView" but no provider
+
+  var _showFav = false;
+  var _isLoading = false;
+
   @override
   void initState() {
+    // doens't support listening cause may pointlessly
+    // rebuild the widget associated with the event handler
+    // although the widget tree doesn't care about it
+    setState(() => _isLoading = true);
+    Future.delayed(Duration.zero)
+        .then((_) => Provider.of<Products>(context, listen: false).getProduct())
+        .then((value) => setState(() => _isLoading = false));
     super.initState();
-    Provider.of<Products>(context, listen: false).getProduct();
   }
 
-  var showFav = false;
   @override
   Widget build(BuildContext context)
       // final cart = Provider.of<Cart>(context);
@@ -44,9 +53,10 @@ class _ProductsPageState extends State<ProductsPage> {
                 onSelected: (FavEnum val) {
                   setState(() {
                     if (val == FavEnum.favoriteProds) {
-                      showFav = true;
+                      _showFav = true;
+                      // trigger this on the backend I guess
                     } else {
-                      showFav = false;
+                      _showFav = false;
                     }
                   });
                 },
@@ -80,6 +90,8 @@ class _ProductsPageState extends State<ProductsPage> {
                   ))
             ]),
         drawer: const NavDrawer(),
-        body: ProductGridview(checkFav: showFav),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : ProductGridview(checkFav: _showFav),
       );
 }
