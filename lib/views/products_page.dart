@@ -32,7 +32,7 @@ class _ProductsPageState extends State<ProductsPage> {
     setState(() => _isLoading = true);
     Future.delayed(Duration.zero)
         .then((_) => Provider.of<Products>(context, listen: false).getProduct())
-        .then((value) => setState(() => _isLoading = false));
+        .then((_) => setState(() => _isLoading = false));
     super.initState();
   }
 
@@ -50,27 +50,20 @@ class _ProductsPageState extends State<ProductsPage> {
             iconTheme: const IconThemeData(color: Colors.black),
             actions: [
               PopupMenuButton(
-                onSelected: (FavEnum val) {
-                  setState(() {
-                    if (val == FavEnum.favoriteProds) {
-                      _showFav = true;
-                      // trigger this on the backend I guess
-                    } else {
-                      _showFav = false;
-                    }
-                  });
-                },
+                onSelected: (FavEnum val) => setState(() {
+                  val == FavEnum.favoriteProds
+                      ? _showFav = true
+                      : _showFav = false;
+                }),
                 icon: const Icon(Icons.more_vert_rounded),
                 itemBuilder: (_) => const [
                   PopupMenuItem(
-                    value: FavEnum.favoriteProds,
-                    child: Text("Favourite",
-                        style: TextStyle(color: Colors.black)),
-                  ),
+                      value: FavEnum.favoriteProds,
+                      child: Text("Favourite",
+                          style: TextStyle(color: Colors.black))),
                   PopupMenuItem(
-                    value: FavEnum.allProds,
-                    child: Text("All", style: TextStyle(color: Colors.black)),
-                  )
+                      value: FavEnum.allProds,
+                      child: Text("All", style: TextStyle(color: Colors.black)))
                 ],
               ),
               Consumer<Cart>(

@@ -141,11 +141,6 @@ class _EditProductState extends State<EditProduct> {
                           child: const Text('Okay'))
                     ]));
       }
-      // finally {
-      //   // runs irrespective of the try and/or catch running
-      //   setState(() => _isLoading = false);
-      //   Navigator.of(context).pop();
-      // }
     }
     // the code below will now run if any of the if/else
     // stuff runs

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-
 // basically, you should use a getter when you wanna
 // return/get a value/object/list, and use a function when
 // you wanna perform an actual action that requires listening
@@ -44,22 +41,7 @@ class Cart with ChangeNotifier {
 
   void addItem(String prodId, String title, double price) {
     // check if item already exists, then increase qty
-    final url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/cart.json");
-    // http.post(url, body: json.decode({
-    //   'id': prodId
-    //   'title': title,
-    //   'price': price,
-    //   'quantity': stuff,
-    // }));
-
     if (_items.containsKey(prodId)) {
-      //   http.post(url, body: json.decode({
-      //   'id': prodId
-      //   'title': title,
-      //   'price': price,
-      //   'quantity': stuff,
-      // }));
       _items.update(
           prodId,
           (itemExist) => CartItem(
@@ -69,7 +51,6 @@ class Cart with ChangeNotifier {
               quantity: itemExist.quantity + 1));
     } else {
       // hence, push object into map
-
       _items.putIfAbsent(prodId,
           () => CartItem(id: prodId, title: title, price: price, quantity: 1));
     }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'providers/auth.dart';
 import 'providers/product.dart';
 import './providers/cart.dart';
 import './providers/order.dart';
 
-import './views/products_page.dart';
+import './views/auth_page.dart';
+// import './views/products_page.dart';
 import './views/product_detail.dart';
 import './views/order_page.dart';
 import './views/cart_page.dart';
@@ -26,6 +28,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MultiProvider(
           providers: [
+            ChangeNotifierProvider(create: (ctxt) => Auth()),
             ChangeNotifierProvider(create: (ctxt) => Products()),
             ChangeNotifierProvider(create: (ctxt) => Cart()),
             ChangeNotifierProvider(create: (ctxt) => Order())
@@ -37,7 +40,7 @@ class MyApp extends StatelessWidget {
                 primarySwatch: Colors.green,
                 primaryColor: const Color.fromARGB(255, 6, 212, 195),
                 fontFamily: 'Lato'),
-            home: const ProductsPage(),
+            home: const AuthPage(),
             routes: {
               ProductDetail.routename: (ctxt) => const ProductDetail(),
               CartPage.routeName: (ctxt) => const CartPage(),

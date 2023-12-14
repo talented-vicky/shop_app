@@ -20,7 +20,7 @@ class OrderItem with ChangeNotifier {
 
 class Order with ChangeNotifier {
   List<OrderItem> _orders = [];
-  // this can only be accessed in this class
+  // this can only be accessed in this classSSS
 
   List<OrderItem> get allOrders {
     return [..._orders];
@@ -35,33 +35,35 @@ class Order with ChangeNotifier {
     try {
       final resp = await http.get(url);
 
-      final object = json.decode(resp.body) as Map<String, dynamic>;
+      var object = json.decode(resp.body);
       final List<OrderItem> orderList = [];
 
-      object.forEach((check, ckd) {
-        final demo = ckd['cartProducts'] as List<dynamic>;
-        // print(demo);
-        demo.map((check) => {print(check)});
-        // demo.map((check) => {print(check['title'])});
-      });
-      object.forEach((orderId, orderData) =>
-          // add what I'm getting from this into the current
-          // list of order
-          orderList.add(OrderItem(
-            id: orderId,
-            totalAmount: orderData['amount'],
-            date: DateTime.parse(orderData['date']),
-            cartproducts: (orderData['cartProducts'] as List<dynamic>)
-                .map((cartData) => CartItem(
-                      id: cartData['id'],
-                      title: cartData['title'],
-                      price: cartData['price'],
-                      quantity: cartData['quantity'],
-                    ))
-                .toList(),
-          )));
+      if (object == null) {
+        return;
+      }
+
+      final mapObject = object as Map<String, dynamic>;
+      mapObject.forEach(
+        (orderId, orderData) =>
+            // add what I'm getting from this into the current
+            // list of order
+            orderList.add(OrderItem(
+          id: orderId,
+          totalAmount: orderData['totalAmount'],
+          date: DateTime.parse(orderData['date']),
+          cartproducts: (orderData['cartProducts'] as List<dynamic>)
+              .map((cartData) => CartItem(
+                    id: cartData['id'],
+                    title: cartData['title'],
+                    price: cartData['price'],
+                    quantity: cartData['quantity'],
+                  ))
+              .toList(),
+        )),
+      );
       // replace the init list with this newly populated
       // order list
+      // _orders = orderList.reversed.toList();
       _orders = orderList;
       notifyListeners();
     } catch (err) {

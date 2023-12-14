@@ -94,10 +94,15 @@ class Products with ChangeNotifier {
         "https://shop-app-73a49-default-rtdb.firebaseio.com/products.json");
     try {
       final data = await http.get(url);
-      final object = json.decode(data.body) as Map<String, dynamic>;
+      var object = json.decode(data.body);
       final List<Product> prodList = [];
 
-      object.forEach(
+      if (object == null) {
+        return;
+      }
+
+      final mapObj = object as Map<String, dynamic>;
+      mapObj.forEach(
         (prodId, prodData) => prodList.add(Product(
             id: prodId,
             title: prodData['title'],
@@ -108,7 +113,6 @@ class Products with ChangeNotifier {
       _prods = prodList;
       notifyListeners();
     } catch (error) {
-      print(error);
       throw error;
       // I have to "throw" erros peradventure I need to
       // display any form of error info to the user

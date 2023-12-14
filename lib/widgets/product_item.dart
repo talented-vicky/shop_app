@@ -13,6 +13,7 @@ class ProductItem extends StatelessWidget {
   //   required this.img,
   //   required this.title,
   // });
+  const ProductItem({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,43 +30,41 @@ class ProductItem extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(5),
           child: GridTile(
-            footer: GridTileBar(
-                backgroundColor: Colors.black26,
-                title: Text(product.title),
-                leading: Consumer<Product>(
-                    // consumer ensures only the iconbutton
-                    // sub-widget rebuilds whenever user clicks fav icon
-                    builder: (_, productData, ch) => IconButton(
+              footer: GridTileBar(
+                  backgroundColor: Colors.black26,
+                  title: Text(product.title),
+                  leading: Consumer<Product>(
+                      // consumer ensures only the iconbutton
+                      // sub-widget rebuilds whenever user clicks fav icon
+                      builder: (_, productData, ch) => IconButton(
                           onPressed: () => productData.toggleFav(),
                           icon: Icon(productData.isFav
                               ? Icons.favorite
-                              : Icons.favorite_border),
-                        )),
-                trailing: IconButton(
-                  onPressed: () {
-                    cart.addItem(product.id, product.title, product.price);
-                    // whenever I click the add-to-cart button on each product
-                    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: const Text("Successfully Added Item to Cart"),
-                        duration: const Duration(seconds: 5),
-                        action: SnackBarAction(
-                          label: "UNDO",
-                          onPressed: () => cart.undoItem(product.id),
-                        )));
-                  },
-                  icon: const Icon(Icons.shopping_cart_outlined),
-                )),
-            child: GestureDetector(
-                onTap: () => Navigator.of(context).pushNamed(
-                      ProductDetail.routename,
-                      // arguments: id,
-                      arguments: product.id,
-                      // forwarding only the id as the argument
-                    ),
-                // child: Image.network(img, fit: BoxFit.cover)),
-                child: Image.network(product.imageUrl, fit: BoxFit.cover)),
-          ),
+                              : Icons.favorite_border))),
+                  trailing: IconButton(
+                    onPressed: () {
+                      cart.addItem(product.id, product.title, product.price);
+                      // whenever I click the add-to-cart button on each product
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content:
+                              const Text("Successfully Added Item to Cart"),
+                          duration: const Duration(seconds: 5),
+                          action: SnackBarAction(
+                              label: "UNDO",
+                              onPressed: () => cart.undoItem(product.id))));
+                    },
+                    icon: const Icon(Icons.shopping_cart_outlined),
+                  )),
+              child: GestureDetector(
+                  onTap: () => Navigator.of(context).pushNamed(
+                        ProductDetail.routename,
+                        // arguments: id,
+                        arguments: product.id,
+                        // forwarding only the id as the argument
+                      ),
+                  // child: Image.network(img, fit: BoxFit.cover)),
+                  child: Image.network(product.imageUrl, fit: BoxFit.cover))),
         ));
   }
 }
