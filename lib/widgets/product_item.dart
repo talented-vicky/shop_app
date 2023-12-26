@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/product.dart';
 import '../providers/cart.dart';
 import '../views/product_detail.dart';
+import '../providers/auth.dart';
 
 class ProductItem extends StatelessWidget {
   // final String id, img, title;
@@ -22,6 +23,7 @@ class ProductItem extends StatelessWidget {
     // I'm using false cause I don't want to listen to changes
     // on this widget, just a one-time stuff
     final cart = Provider.of<Cart>(context, listen: false);
+    final auth = Provider.of<Auth>(context, listen: false);
     // I can access cart 'cause I have it provided in my main
     // dart file :: also ensuring widget doesn't rebuild when
     // changes happen in the cart file, just notifying addition
@@ -37,7 +39,8 @@ class ProductItem extends StatelessWidget {
                       // consumer ensures only the iconbutton
                       // sub-widget rebuilds whenever user clicks fav icon
                       builder: (_, productData, ch) => IconButton(
-                          onPressed: () => productData.toggleFav(),
+                          onPressed: () =>
+                              productData.toggleFav(auth.fetchToken),
                           icon: Icon(productData.isFav
                               ? Icons.favorite
                               : Icons.favorite_border))),

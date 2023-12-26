@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth.dart';
+import '../models/exception.dart';
 
 enum AuthState { signUp, logIn }
 
@@ -13,9 +14,6 @@ class AuthPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final deviceSize = MediaQuery.of(context).size;
-    // final matTrans = Matrix4.rotationZ(-8 * pi / 180);
-    // matTrans.translate(-10);
-    // modifies what it's called on but doesn't return new obj
     return Scaffold(
         body: Stack(children: [
       Container(
@@ -37,8 +35,6 @@ class AuthPage extends StatelessWidget {
                 Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               Flexible(
                   child: Container(
-                      // transform: Matrix4.rotationZ(-8 * pi / 180)
-                      //   ..translate(-10),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 30, vertical: 5),
                       margin: const EdgeInsets.only(bottom: 20),
@@ -51,7 +47,7 @@ class AuthPage extends StatelessWidget {
                                 color: Colors.black,
                                 offset: Offset(0, 2))
                           ]),
-                      child: const Text("Shop App",
+                      child: const Text("ShopApp",
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 30,
@@ -101,6 +97,20 @@ class _AuthWidgetState extends State<AuthWidget> {
     }
   }
 
+  void _showError(String msg) {
+    showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+              title: const Text('Error Occured!'),
+              content: Text(msg),
+              actions: [
+                TextButton(
+                    onPressed: () => Navigator.of(context).pop(context),
+                    child: const Text('Okay'))
+              ],
+            ));
+  }
+
   Future<void> _signUser() async {
     if (!_formkey.currentState!.validate()) {
       // hence error occured validating
@@ -112,14 +122,30 @@ class _AuthWidgetState extends State<AuthWidget> {
     setState(() => _isLoading = true);
     // I show a loading inidiator imediately I click save
 
-    if (_authstate == AuthState.logIn) {
-      // do some login stuff here
-    } else {
-      await Provider.of<Auth>(context, listen: false)
-          .signUp(_authInfo['email']!, _authInfo['password']!);
+    try {
+      if (_authstate == AuthState.logIn) {
+        await Provider.of<Auth>(context, listen: false)
+            .logIn(_authInfo['email']!, _authInfo['password']!);
+      } else {
+        await Provider.of<Auth>(context, listen: false)
+            .signUp(_authInfo['email']!, _authInfo['password']!);
+      }
+    } on Exceptions catch (customErr) {
+      // customErr is what I'm catching from the auth provider
+      // error handler
+      var newError = 'Authentication Error';
+      if (customErr.toString() == 'EMAIL_EXISTS') {
+        newError = "Email already exists, please login";
+      } else if (customErr.toString() == 'INVALID_LOGIN_CREDENTIALS') {
+        newError = 'No Email In Database OR Email/Password incorrect';
+      }
+      _showError(newError);
+    } catch (err) {
+      const error = 'ERROR! Please try again OR check internet connection ';
+      _showError(error);
     }
     setState(() => _isLoading = false);
-    // remove spinner since I'm done signing up or in
+    // remove spinner since I'm done signing up/in
   }
 
   @override
@@ -143,7 +169,7 @@ class _AuthWidgetState extends State<AuthWidget> {
                       decoration: const InputDecoration(labelText: 'E-mail'),
                       keyboardType: TextInputType.emailAddress,
                       validator: (val) {
-                        if (val!.isEmpty || val.contains('@')) {
+                        if (val!.isEmpty || !val.contains('@')) {
                           return 'Invalid Email';
                         }
                         return null;
@@ -185,23 +211,26 @@ class _AuthWidgetState extends State<AuthWidget> {
                     else
                       ElevatedButton(
                         onPressed: _signUser,
-                        style: ButtonStyle(
-                            // padding: ,
-                            // backgroundColor: , // button color
-                            // foregroundColor: , // button text color
-                            ),
                         child: Text(_authstate == AuthState.signUp
                             ? 'SIGN UP'
                             : 'LOGIN'),
                         // style: ButtonStyle(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
                       ),
-                    TextButton(
-                      onPressed: _swithAuthState,
-                      style: const ButtonStyle(
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                          '${_authstate == AuthState.logIn ? 'SIGNUP' : 'LOGIN'} INSTEAD'),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Text(
+                            '${_authstate == AuthState.logIn ? 'Dont' : 'Already'} have an account?'),
+                        TextButton(
+                          onPressed: _swithAuthState,
+                          style: const ButtonStyle(
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                              '${_authstate == AuthState.logIn ? 'SIGNUP' : 'LOGIN'} INSTEAD'),
+                        ),
+                      ],
                     )
                   ],
                 )))));

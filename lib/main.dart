@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'providers/auth.dart';
-import 'providers/product.dart';
+import './providers/auth.dart';
+import './providers/product.dart';
 import './providers/cart.dart';
 import './providers/order.dart';
 
 import './views/auth_page.dart';
-// import './views/products_page.dart';
+import './views/products_page.dart';
 import './views/product_detail.dart';
 import './views/order_page.dart';
 import './views/cart_page.dart';
@@ -26,21 +26,43 @@ class MyApp extends StatelessWidget {
   // the Provider.of<"ProductP">(ctxt)
 
   @override
-  Widget build(BuildContext context) => MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (ctxt) => Auth()),
-            ChangeNotifierProvider(create: (ctxt) => Products()),
-            ChangeNotifierProvider(create: (ctxt) => Cart()),
-            ChangeNotifierProvider(create: (ctxt) => Order())
-          ],
-          child: MaterialApp(
+  Widget build(BuildContext context) {
+    return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (ctxt) => Auth()), //a
+          // ChangeNotifierProvider(create: (ctxt) => Products()),
+          ChangeNotifierProxyProvider<Auth, Products>(
+            update: (ctxt, auth, prevProd) => Products(
+                authToken: auth.fetchToken,
+                prodList: prevProd == null ? [] : prevProd.prodList),
+            create: (_) => Products(authToken: '', prodList: []),
+          ),
+          // 1st <>param tells what it depends on to rebuild
+          // 2nd angle param tells what will be rebuilt, added
+          // prevProd as required in model to ensure I don't lose
+          // product list when auth changes
+          ChangeNotifierProvider(create: (ctxt) => Cart()),
+          // ChangeNotifierProvider(create: (ctxt) => Order())
+          ChangeNotifierProxyProvider<Auth, Order>(
+              update: (ctxt, auth, prevOrder) => Order(
+                  authToken: auth.fetchToken,
+                  orders: prevOrder == null ? [] : prevOrder.orders),
+              create: (_) => Order(authToken: '', orders: []))
+        ],
+        child: Consumer<Auth>(builder: (ctxt, auth, ch) {
+          // ch is usually needed if I have a static part
+          // or fixed widget I don't wanna rebuild
+          // BTW, I've now made sure the widget below only rebuilds
+          // if and only if the Auth() provider rebuilds, usually
+          // indicated by notifylisteners
+          return MaterialApp(
             title: "devApp", // what'll show on the app icon gangan
             debugShowCheckedModeBanner: false,
             theme: ThemeData(
                 primarySwatch: Colors.green,
                 primaryColor: const Color.fromARGB(255, 6, 212, 195),
                 fontFamily: 'Lato'),
-            home: const AuthPage(),
+            home: auth.isAuth ? const ProductsPage() : const AuthPage(),
             routes: {
               ProductDetail.routename: (ctxt) => const ProductDetail(),
               CartPage.routeName: (ctxt) => const CartPage(),
@@ -48,18 +70,9 @@ class MyApp extends StatelessWidget {
               UserProducts.routeName: (ctxt) => const UserProducts(),
               EditProduct.routeName: (ctxt) => const EditProduct(),
             },
-          ));
+          );
+        }));
+  }
 }
 
 // state is simply dynamic data which affects UI
-// home page should have search (extreme right) and 
-// logo (left) alone
-
-
-
-
-/*
-C:\Users\HP\Documents\personal\php\php.exe is not a valid 
-php executable. Use the setting 'php.validate.executablePath' 
-to configure the PHP executable.
- */

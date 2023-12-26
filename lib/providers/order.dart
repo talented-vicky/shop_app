@@ -19,19 +19,23 @@ class OrderItem with ChangeNotifier {
 }
 
 class Order with ChangeNotifier {
-  List<OrderItem> _orders = [];
+  final authToken;
+
+  List<OrderItem> orders = [];
   // this can only be accessed in this classSSS
 
+  Order({required this.authToken, required this.orders});
+
   List<OrderItem> get allOrders {
-    return [..._orders];
+    return [...orders];
     // ensuring outside of this class we can't access
-    // "_orders" hence we're pulling whatever order
+    // "orders" hence we're pulling whatever order
     // list currently exists
   }
 
   Future<void> getOrder() async {
     final url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/order.json");
+        "https://shop-app-73a49-default-rtdb.firebaseio.com/order.json?auth=$authToken");
     try {
       final resp = await http.get(url);
 
@@ -63,8 +67,8 @@ class Order with ChangeNotifier {
       );
       // replace the init list with this newly populated
       // order list
-      // _orders = orderList.reversed.toList();
-      _orders = orderList;
+      // orders = orderList.reversed.toList();
+      orders = orderList;
       notifyListeners();
     } catch (err) {
       print(err);
@@ -74,7 +78,7 @@ class Order with ChangeNotifier {
 
   Future<void> placeOrder(List<CartItem> cartitem, double orderPrice) async {
     final url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/order.json");
+        "https://shop-app-73a49-default-rtdb.firebaseio.com/order.json?auth=$authToken");
 
     try {
       final datetime = DateTime.now();
@@ -95,7 +99,7 @@ class Order with ChangeNotifier {
 
       final orderId = json.decode(resp.body)['name'];
 
-      _orders.add(OrderItem(
+      orders.add(OrderItem(
         id: orderId,
         totalAmount: orderPrice,
         cartproducts: cartitem,

@@ -20,7 +20,7 @@ class Product with ChangeNotifier {
     this.isFav = false,
   });
 
-  Future<void> toggleFav() async {
+  Future<void> toggleFav(String token) async {
     // saving current status in memory in case of future revert
     dynamic stat = isFav;
 
@@ -28,7 +28,7 @@ class Product with ChangeNotifier {
     notifyListeners();
 
     final url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/products.json");
+        "https://shop-app-73a49-default-rtdb.firebaseio.com/products.json?auth=$token");
     final resp = await http.patch(url, body: json.encode({'isFav': isFav}));
 
     if (resp.statusCode >= 400) {
@@ -41,7 +41,11 @@ class Product with ChangeNotifier {
 }
 
 class Products with ChangeNotifier {
-  List<Product> _prods = [];
+  List<Product> prodList = [];
+  final String authToken;
+
+  Products({required this.authToken, required this.prodList});
+
   // final List<Product> _prods = [
   //   Product(
   //     id: 'p1',
@@ -78,11 +82,11 @@ class Products with ChangeNotifier {
   // ];
 
   List<Product> get prods {
-    return [..._prods];
+    return [...prodList];
   }
 
   List<Product> get favProds {
-    return _prods.where((elem) => elem.isFav == true).toList();
+    return prodList.where((elem) => elem.isFav == true).toList();
   }
 
   Product findbyId(String id) {
@@ -91,11 +95,11 @@ class Products with ChangeNotifier {
 
   Future<void> getProduct() async {
     final url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/products.json");
+        "https://shop-app-73a49-default-rtdb.firebaseio.com/products.json?auth=$authToken");
     try {
       final data = await http.get(url);
       var object = json.decode(data.body);
-      final List<Product> prodList = [];
+      final List<Product> tempProdList = [];
 
       if (object == null) {
         return;
@@ -103,14 +107,14 @@ class Products with ChangeNotifier {
 
       final mapObj = object as Map<String, dynamic>;
       mapObj.forEach(
-        (prodId, prodData) => prodList.add(Product(
+        (prodId, prodData) => tempProdList.add(Product(
             id: prodId,
             title: prodData['title'],
             imageUrl: prodData['imageUrl'],
             description: prodData['description'],
             price: prodData['price'])),
       );
-      _prods = prodList;
+      prodList = tempProdList;
       notifyListeners();
     } catch (error) {
       throw error;
@@ -121,7 +125,7 @@ class Products with ChangeNotifier {
 
   Future<void> addProduct(Product prodDetail) async {
     var url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/products.json");
+        "https://shop-app-73a49-default-rtdb.firebaseio.com/products.json?auth=$authToken");
     try {
       final postRes = await http.post(url,
           body: json.encode({
@@ -144,7 +148,7 @@ class Products with ChangeNotifier {
         description: prodDetail.description,
         price: prodDetail.price,
       );
-      _prods.add(newProd);
+      prodList.add(newProd);
       // now adding the data to the local storage list
 
       notifyListeners();
@@ -154,12 +158,12 @@ class Products with ChangeNotifier {
   }
 
   Future<void> updateOne(String prodId, Product prodDetail) async {
-    final prodInd = _prods.indexWhere((elem) => elem.id == prodId);
+    final prodInd = prodList.indexWhere((elem) => elem.id == prodId);
     // recall this would give -1 if it doesn't find product
 
     if (prodInd >= 0) {
       var url = Uri.parse(
-          "https://shop-app-73a49-default-rtdb.firebaseio.com/products/$prodId.json");
+          "https://shop-app-73a49-default-rtdb.firebaseio.com/products/$prodId.json?auth=$authToken");
 
       await http.patch(
         url,
@@ -173,7 +177,7 @@ class Products with ChangeNotifier {
         }),
       );
 
-      _prods[prodInd] = prodDetail;
+      prodList[prodInd] = prodDetail;
       notifyListeners();
     } else {
       print('...');
@@ -183,13 +187,13 @@ class Products with ChangeNotifier {
   Future<void> deleteOne(String prodId) async {
     // FOR NOW, delete product Icon doesn't show the dialogue
     final url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/products/$prodId.json");
-    final prodInd = _prods.indexWhere((elem) => elem.id == prodId);
-    dynamic prod = _prods[prodInd];
+        "https://shop-app-73a49-default-rtdb.firebaseio.com/products/$prodId.json?auth=$authToken");
+    final prodInd = prodList.indexWhere((elem) => elem.id == prodId);
+    dynamic prod = prodList[prodInd];
     // Storing a pointer to this product in memory
 
     // Removing product locally from list
-    _prods.removeAt(prodInd);
+    prodList.removeAt(prodInd);
     notifyListeners();
 
     // Removing product from firebase db, but also ensuring
@@ -198,7 +202,7 @@ class Products with ChangeNotifier {
     if (resp.statusCode >= 400) {
       // There's an error, hence I can successfully roll
       // back the product locally into list
-      _prods.insert(prodInd, prod);
+      prodList.insert(prodInd, prod);
       notifyListeners();
       throw Exceptions(msg: "Error Deleting Product");
     }
