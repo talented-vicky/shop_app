@@ -20,7 +20,7 @@ class Product with ChangeNotifier {
     this.isFav = false,
   });
 
-  Future<void> toggleFav(String token) async {
+  Future<void> toggleFav(String token, String userId) async {
     // saving current status in memory in case of future revert
     dynamic stat = isFav;
 
@@ -28,8 +28,9 @@ class Product with ChangeNotifier {
     notifyListeners();
 
     final url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/products.json?auth=$token");
-    final resp = await http.patch(url, body: json.encode({'isFav': isFav}));
+        "https://shop-app-73a49-default-rtdb.firebaseio.com/favourites/$userId/$id.json?auth=$token");
+    // switched (from patch) to put cause I wanna always overwrite
+    final resp = await http.put(url, body: json.encode(isFav));
 
     if (resp.statusCode >= 400) {
       // error, so I'll revert changes
@@ -43,8 +44,10 @@ class Product with ChangeNotifier {
 class Products with ChangeNotifier {
   List<Product> prodList = [];
   final String authToken;
+  final String userId;
 
-  Products({required this.authToken, required this.prodList});
+  Products(
+      {required this.authToken, required this.prodList, required this.userId});
 
   // final List<Product> _prods = [
   //   Product(
@@ -93,32 +96,45 @@ class Products with ChangeNotifier {
     return prods.firstWhere((elem) => elem.id == id);
   }
 
-  Future<void> getProduct() async {
-    final url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/products.json?auth=$authToken");
+  Future<void> getProduct([bool filter = false]) async {
+    final filterString = filter ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+    var url = Uri.parse(
+        'https://shop-app-73a49-default-rtdb.firebaseio.com/products.json?auth=$authToken&$filterString');
+
     try {
       final data = await http.get(url);
       var object = json.decode(data.body);
-      final List<Product> tempProdList = [];
 
       if (object == null) {
         return;
       }
 
+      url = Uri.parse(
+          "https://shop-app-73a49-default-rtdb.firebaseio.com/favourites/$userId.json?auth=$authToken");
+      final dataFav = await http.get(url);
+      final favObject = json.decode(dataFav.body);
+
+      final List<Product> tempProdList = [];
       final mapObj = object as Map<String, dynamic>;
+
       mapObj.forEach(
         (prodId, prodData) => tempProdList.add(Product(
-            id: prodId,
-            title: prodData['title'],
-            imageUrl: prodData['imageUrl'],
-            description: prodData['description'],
-            price: prodData['price'])),
+          id: prodId,
+          title: prodData['title'],
+          imageUrl: prodData['imageUrl'],
+          description: prodData['description'],
+          price: prodData['price'],
+          isFav: favObject == null ? false : favObject[prodId] ?? false,
+          // if prodId is null, then "favObject[prodId]" would yield
+          // null, but I want it to yield false hence the  "??"
+        )),
       );
       prodList = tempProdList;
       notifyListeners();
     } catch (error) {
+      print('got here');
       throw error;
-      // I have to "throw" erros peradventure I need to
+      // I have to "throw" errors peradventure I need to
       // display any form of error info to the user
     }
   }
@@ -133,8 +149,10 @@ class Products with ChangeNotifier {
             'title': prodDetail.title,
             'price': prodDetail.price,
             'imageUrl': prodDetail.imageUrl,
+            'creatorId': userId,
+            // userId of currently logged in user from Auth.dart
             'description': prodDetail.description,
-            'isFav': prodDetail.isFav,
+            // 'isFav': prodDetail.isFav, no longer needed
           }));
       // the above is what I've added to firebase database
 

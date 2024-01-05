@@ -36,14 +36,15 @@ class ProductItem extends StatelessWidget {
                   backgroundColor: Colors.black26,
                   title: Text(product.title),
                   leading: Consumer<Product>(
-                      // consumer ensures only the iconbutton
-                      // sub-widget rebuilds whenever user clicks fav icon
-                      builder: (_, productData, ch) => IconButton(
-                          onPressed: () =>
-                              productData.toggleFav(auth.fetchToken),
-                          icon: Icon(productData.isFav
-                              ? Icons.favorite
-                              : Icons.favorite_border))),
+                    // consumer ensures only the iconbutton
+                    // sub-widget rebuilds whenever user clicks fav icon
+                    builder: (_, productData, ch) => IconButton(
+                        onPressed: () => productData.toggleFav(
+                            auth.fetchToken, auth.fetchUserId),
+                        icon: Icon(productData.isFav
+                            ? Icons.favorite
+                            : Icons.favorite_border)),
+                  ),
                   trailing: IconButton(
                     onPressed: () {
                       cart.addItem(product.id, product.title, product.price);

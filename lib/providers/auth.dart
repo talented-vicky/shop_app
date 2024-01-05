@@ -27,6 +27,10 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  String get fetchUserId {
+    return _userId!;
+  }
+
   Future<void> _authenticate(
       String email, String password, String linkTrim) async {
     final url = Uri.parse(

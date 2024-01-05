@@ -33,9 +33,15 @@ class MyApp extends StatelessWidget {
           // ChangeNotifierProvider(create: (ctxt) => Products()),
           ChangeNotifierProxyProvider<Auth, Products>(
             update: (ctxt, auth, prevProd) => Products(
-                authToken: auth.fetchToken,
-                prodList: prevProd == null ? [] : prevProd.prodList),
-            create: (_) => Products(authToken: '', prodList: []),
+              authToken: auth.fetchToken,
+              userId: auth.fetchUserId,
+              prodList: prevProd == null ? [] : prevProd.prodList,
+            ),
+            create: (_) => Products(
+              authToken: '',
+              userId: '',
+              prodList: [],
+            ),
           ),
           // 1st <>param tells what it depends on to rebuild
           // 2nd angle param tells what will be rebuilt, added
