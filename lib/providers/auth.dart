@@ -1,5 +1,5 @@
+import 'dart:async';
 import 'dart:convert';
-// import 'dart:js_interop';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -7,9 +7,10 @@ import 'package:http/http.dart' as http;
 import '../models/exception.dart';
 
 class Auth with ChangeNotifier {
-  String? _token;
-  late DateTime? _expiryDate;
-  String? _userId;
+  dynamic _token;
+  DateTime? _expiryDate;
+  dynamic _userId;
+  Timer? _authClock;
 
   bool get isAuth {
     if (fetchToken == null) {
@@ -18,7 +19,7 @@ class Auth with ChangeNotifier {
     return true;
   }
 
-  dynamic get fetchToken {
+  get fetchToken {
     if (_token != null &&
         _expiryDate != null &&
         _expiryDate!.isAfter(DateTime.now())) {
@@ -27,8 +28,8 @@ class Auth with ChangeNotifier {
     return null;
   }
 
-  String get fetchUserId {
-    return _userId!;
+  get fetchUserId {
+    return _userId;
   }
 
   Future<void> _authenticate(
@@ -57,6 +58,8 @@ class Auth with ChangeNotifier {
       _expiryDate = DateTime.now().add(Duration(
         seconds: int.parse(result['expiresIn']),
       ));
+
+      _autoLogout();
       notifyListeners();
     } catch (err) {
       throw err;
@@ -69,5 +72,23 @@ class Auth with ChangeNotifier {
 
   Future<void> logIn(String email, String password) async {
     return _authenticate(email, password, 'signInWithPassword');
+  }
+
+  void logOut() {
+    _token = null;
+    _userId = null;
+    _expiryDate = null;
+
+    notifyListeners();
+  }
+
+  void _autoLogout() {
+    if (_authClock != null) {
+      _authClock!.cancel();
+      // canceling timer if there's already one ongoing
+    }
+    final expTime = _expiryDate!.difference(DateTime.now()).inSeconds;
+    // calling logOut function after "expTime" seconds
+    _authClock = Timer(Duration(seconds: expTime), logOut);
   }
 }

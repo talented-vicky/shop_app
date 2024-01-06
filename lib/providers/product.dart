@@ -43,8 +43,8 @@ class Product with ChangeNotifier {
 
 class Products with ChangeNotifier {
   List<Product> prodList = [];
-  final String authToken;
-  final String userId;
+  final dynamic authToken;
+  final dynamic userId;
 
   Products(
       {required this.authToken, required this.prodList, required this.userId});

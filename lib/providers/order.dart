@@ -19,12 +19,13 @@ class OrderItem with ChangeNotifier {
 }
 
 class Order with ChangeNotifier {
-  final authToken;
+  final dynamic authToken;
+  final dynamic userId;
 
   List<OrderItem> orders = [];
   // this can only be accessed in this classSSS
 
-  Order({required this.authToken, required this.orders});
+  Order({required this.authToken, required this.orders, required this.userId});
 
   List<OrderItem> get allOrders {
     return [...orders];
@@ -35,7 +36,7 @@ class Order with ChangeNotifier {
 
   Future<void> getOrder() async {
     final url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/order.json?auth=$authToken");
+        'https://shop-app-73a49-default-rtdb.firebaseio.com/order/$userId.json?auth=$authToken');
     try {
       final resp = await http.get(url);
 
@@ -71,14 +72,13 @@ class Order with ChangeNotifier {
       orders = orderList;
       notifyListeners();
     } catch (err) {
-      print(err);
       throw err;
     }
   }
 
   Future<void> placeOrder(List<CartItem> cartitem, double orderPrice) async {
     final url = Uri.parse(
-        "https://shop-app-73a49-default-rtdb.firebaseio.com/order.json?auth=$authToken");
+        "https://shop-app-73a49-default-rtdb.firebaseio.com/order/$userId.json?auth=$authToken");
 
     try {
       final datetime = DateTime.now();
@@ -87,6 +87,7 @@ class Order with ChangeNotifier {
           body: json.encode({
             "totalAmount": orderPrice,
             "date": datetime.toIso8601String(),
+            "creatorId": userId,
             "cartProducts": cartitem
                 .map((prod) => {
                       "id": prod.id,

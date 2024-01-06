@@ -52,8 +52,9 @@ class MyApp extends StatelessWidget {
           ChangeNotifierProxyProvider<Auth, Order>(
               update: (ctxt, auth, prevOrder) => Order(
                   authToken: auth.fetchToken,
+                  userId: auth.fetchUserId,
                   orders: prevOrder == null ? [] : prevOrder.orders),
-              create: (_) => Order(authToken: '', orders: []))
+              create: (_) => Order(authToken: '', userId: '', orders: []))
         ],
         child: Consumer<Auth>(builder: (ctxt, auth, ch) {
           // ch is usually needed if I have a static part
@@ -82,3 +83,4 @@ class MyApp extends StatelessWidget {
 }
 
 // state is simply dynamic data which affects UI
+// a tribe called Judah - Dec 15

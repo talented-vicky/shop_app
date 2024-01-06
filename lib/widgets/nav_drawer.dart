@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../views/order_page.dart';
 import '../views/user_products.dart';
+import '../providers/auth.dart';
 
 class NavDrawer extends StatelessWidget {
   const NavDrawer({super.key});
@@ -13,7 +15,6 @@ class NavDrawer extends StatelessWidget {
             title:
                 const Text('Welcome!', style: TextStyle(color: Colors.black)),
             shadowColor: Colors.transparent,
-            // backgroundColor: Theme.of(context).primaryColor,
             backgroundColor: Colors.white24,
             automaticallyImplyLeading: false,
           ),
@@ -36,6 +37,18 @@ class NavDrawer extends StatelessWidget {
             onTap: () => Navigator.of(context)
                 .pushReplacementNamed(UserProducts.routeName),
           ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout_outlined),
+            title: const Text('Logout'),
+            onTap: () {
+              Navigator.of(context).pop();
+              Provider.of<Auth>(context, listen: false).logOut();
+            },
+          ),
         ]),
       );
+
+  // Akolawon/Adebisi
+  // 08038027845
 }
