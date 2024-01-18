@@ -43,12 +43,10 @@ class NavDrawer extends StatelessWidget {
             title: const Text('Logout'),
             onTap: () {
               Navigator.of(context).pop();
+              Navigator.of(context).pushReplacementNamed('/');
               Provider.of<Auth>(context, listen: false).logOut();
             },
           ),
         ]),
       );
-
-  // Akolawon/Adebisi
-  // 08038027845
 }

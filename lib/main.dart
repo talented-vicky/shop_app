@@ -69,7 +69,15 @@ class MyApp extends StatelessWidget {
                 primarySwatch: Colors.green,
                 primaryColor: const Color.fromARGB(255, 6, 212, 195),
                 fontFamily: 'Lato'),
-            home: auth.isAuth ? const ProductsPage() : const AuthPage(),
+            home: auth.isAuth
+                ? const ProductsPage()
+                : FutureBuilder(
+                    builder: (ctxt, snp) =>
+                        snp.connectionState == ConnectionState.waiting
+                            ? const CircularProgressIndicator()
+                            : const AuthPage(),
+                    future: auth.autoSignin(),
+                  ),
             routes: {
               ProductDetail.routename: (ctxt) => const ProductDetail(),
               CartPage.routeName: (ctxt) => const CartPage(),
@@ -84,3 +92,5 @@ class MyApp extends StatelessWidget {
 
 // state is simply dynamic data which affects UI
 // a tribe called Judah - Dec 15
+
+// elint // prettier
