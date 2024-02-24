@@ -28,8 +28,8 @@ class ProductItem extends StatelessWidget {
     // dart file :: also ensuring widget doesn't rebuild when
     // changes happen in the cart file, just notifying addition
     return Container(
-        margin: const EdgeInsets.all(5),
-        child: ClipRRect(
+      margin: const EdgeInsets.all(5),
+      child: ClipRRect(
           borderRadius: BorderRadius.circular(5),
           child: GridTile(
               footer: GridTileBar(
@@ -68,7 +68,15 @@ class ProductItem extends StatelessWidget {
                         // forwarding only the id as the argument
                       ),
                   // child: Image.network(img, fit: BoxFit.cover)),
-                  child: Image.network(product.imageUrl, fit: BoxFit.cover))),
-        ));
+                  // child: Image.network(product.imageUrl, fit: BoxFit.cover))),
+                  child: Hero(
+                    tag: product.id,
+                    child: FadeInImage(
+                        fit: BoxFit.cover,
+                        placeholder: const AssetImage(
+                            'assets/images/product-placeholder.png'),
+                        image: NetworkImage(product.imageUrl)),
+                  )))),
+    );
   }
 }

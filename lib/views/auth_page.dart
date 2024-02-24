@@ -66,22 +66,27 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
   bool _isLoading = false;
   final _passwordCtrl = TextEditingController();
   late AnimationController _animeCtrl;
-  late Animation<Size> _animeHeight;
+  // late Animation<Size> _animeHeight;
+  late Animation<Offset> _animeSlide;
   late Animation<double> _opacity;
 
   @override
   void initState() {
     _animeCtrl = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 600),
+      duration: const Duration(milliseconds: 400),
     );
-    _animeHeight = Tween<Size>(
-      begin: const Size(double.infinity, 260),
-      end: const Size(double.infinity, 320),
-    ).animate(CurvedAnimation(
-      parent: _animeCtrl,
-      curve: Curves.easeIn,
-    ));
+    // _animeHeight = Tween<Size>(
+    //   begin: const Size(double.infinity, 260),
+    //   end: const Size(double.infinity, 320),
+    // ).animate(CurvedAnimation(
+    //   parent: _animeCtr l,
+    //   curve: Curves.easeIn,
+    // ));
+    _animeSlide = Tween<Offset>(
+      begin: const Offset(0, -.5),
+      end: const Offset(0, 0),
+    ).animate(CurvedAnimation(parent: _animeCtrl, curve: Curves.easeIn));
     _opacity = Tween(begin: 0.0, end: 1.0).animate(CurvedAnimation(
       parent: _animeCtrl,
       curve: Curves.easeIn,
@@ -213,48 +218,69 @@ class _AuthWidgetState extends State<AuthWidget> with TickerProviderStateMixin {
                     ),
                     const SizedBox(height: 10),
                     // if (_authstate == AuthState.signUp)
-                    FadeTransition(
-                      opacity: _opacity,
-                      child: TextFormField(
-                          enabled: _authstate == AuthState.signUp,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                              labelText: 'Confrim Password'),
-                          validator: _authstate == AuthState.signUp
-                              ? (val) {
-                                  if (val != _passwordCtrl.text) {
-                                    return 'Passwords do not match';
-                                  }
-                                }
-                              : null),
+                    AnimatedContainer(
+                      constraints: BoxConstraints(
+                        // ensuring min and max height of confirmPassword is 0
+                        // when not in signup mode
+                        minHeight: _authstate == AuthState.signUp ? 70 : 0,
+                        maxHeight: _authstate == AuthState.signUp ? 150 : 0,
+                      ),
+                      curve: Curves.easeIn,
+                      duration: const Duration(milliseconds: 500),
+                      child: FadeTransition(
+                        opacity: _opacity,
+                        child: SlideTransition(
+                          position: _animeSlide,
+                          child: TextFormField(
+                              enabled: _authstate == AuthState.signUp,
+                              obscureText: true,
+                              decoration: const InputDecoration(
+                                  labelText: 'Confrim Password'),
+                              validator: _authstate == AuthState.signUp
+                                  ? (val) {
+                                      if (val != _passwordCtrl.text) {
+                                        return 'Passwords do not match';
+                                      }
+                                    }
+                                  : null),
+                        ),
+                        // child: TextFormField(
+                        //     enabled: _authstate == AuthState.signUp,
+                        //     obscureText: true,
+                        //     decoration: const InputDecoration(
+                        //         labelText: 'Confrim Password'),
+                        //     validator: _authstate == AuthState.signUp
+                        //         ? (val) {
+                        //             if (val != _passwordCtrl.text) {
+                        //               return 'Passwords do not match';
+                        //             }
+                        //           }
+                        //         : null),
+                      ),
                     ),
                     const SizedBox(height: 10),
                     if (_isLoading)
                       const CircularProgressIndicator()
                     else
                       ElevatedButton(
-                        onPressed: _signUser,
-                        child: Text(_authstate == AuthState.signUp
-                            ? 'SIGN UP'
-                            : 'LOGIN'),
-                        // style: ButtonStyle(shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))),
-                      ),
+                          onPressed: _signUser,
+                          child: Text(_authstate == AuthState.signUp
+                              ? 'SIGN UP'
+                              : 'LOGIN')),
                     const SizedBox(height: 10),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Text(
-                            '${_authstate == AuthState.logIn ? 'Dont' : 'Already'} have an account?'),
-                        TextButton(
-                          onPressed: _swithAuthState,
-                          style: const ButtonStyle(
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          child: Text(
-                              '${_authstate == AuthState.logIn ? 'SIGNUP' : 'LOGIN'} INSTEAD'),
-                        ),
-                      ],
-                    )
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Text(
+                              '${_authstate == AuthState.logIn ? 'Dont' : 'Already'} have an account?'),
+                          TextButton(
+                              onPressed: _swithAuthState,
+                              style: const ButtonStyle(
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap),
+                              child: Text(
+                                  '${_authstate == AuthState.logIn ? 'SIGNUP' : 'LOGIN'} INSTEAD')),
+                        ])
                   ],
                 )))));
   }

@@ -24,13 +24,15 @@ class ProductDetail extends StatelessWidget {
     ).findbyId(prodId);
 
     return Scaffold(
-        appBar: AppBar(
-          forceMaterialTransparency: true,
-          title: const Text('Details',
-              style: TextStyle(color: Colors.black, fontSize: 17)),
-          iconTheme: const IconThemeData(color: Colors.black),
-        ),
+        // appBar: AppBar(
+        //   forceMaterialTransparency: true,
+        //   title: const Text('Details',
+        //       style: TextStyle(color: Colors.black, fontSize: 17)),
+        //   iconTheme: const IconThemeData(color: Colors.black),
+        // ),
+        // I dont' need appBar since I wanna use slivers
         body: ProductInfo(
+            id: product.id,
             imageUrl: product.imageUrl,
             title: product.title,
             price: product.price,
